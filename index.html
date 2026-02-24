@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>ASCIIメーカー</title>
+
+<style>
+
+body{
+font-family:monospace;
+padding:20px;
+}
+
+#output{
+white-space:pre;
+font-size:5px;
+line-height:5px;
+margin-top:20px;
+}
+
+button{
+padding:10px;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>写真→アスキーアート</h2>
+
+<input type="file" id="imageInput">
+
+<br><br>
+
+<button onclick="convert()">変換</button>
+
+<div id="output">
+
+ここに表示される
+
+</div>
+
+<script>
+
+function convert(){
+
+const file=document.getElementById("imageInput").files[0];
+
+if(!file){
+alert("画像選んで");
+return;
+}
+
+const reader=new FileReader();
+
+reader.onload=function(e){
+
+const img=new Image();
+
+img.onload=function(){
+
+const canvas=document.createElement("canvas");
+const ctx=canvas.getContext("2d");
+
+const size=80;
+
+canvas.width=size;
+canvas.height=size;
+
+ctx.drawImage(img,0,0,size,size);
+
+const data=ctx.getImageData(0,0,size,size).data;
+
+let ascii="";
+
+const chars="@#*+=-:. ";
+
+for(let y=0;y<size;y++){
+
+for(let x=0;x<size;x++){
+
+const i=(y*size+x)*4;
+
+const r=data[i];
+const g=data[i+1];
+const b=data[i+2];
+
+const brightness=(r+g+b)/3;
+
+const index=Math.floor(
+brightness/255*(chars.length-1)
+);
+
+ascii+=chars[index];
+
+}
+
+ascii+="\n";
+
+}
+
+document.getElementById("output").innerText=ascii;
+
+};
+
+img.src=e.target.result;
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+</script>
+
+</body>
+
+</html>
